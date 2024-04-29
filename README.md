@@ -1,1 +1,1 @@
-# teamcity-learn
+# This repository is a collection of CI/CD blueprints that describe best practices in TeamCity / TeamCity Pipelines
