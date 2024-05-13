@@ -134,7 +134,7 @@ object DotNetNuGetPack : BuildType({
     }
 
     dependencies {
-        snapshot(Build) {
+        snapshot(DotNetBuild) {
         }
     }
 })
@@ -165,7 +165,7 @@ object DotNetTest1 : BuildType({
     }
 
     dependencies {
-        snapshot(NuGetPack) {
+        snapshot(DotNetNuGetPack) {
         }
     }
 })
@@ -191,7 +191,7 @@ object DotNetTest2 : BuildType({
     }
 
     dependencies {
-        snapshot(NuGetPack) {
+        snapshot(DotNetNuGetPack) {
         }
     }
 })
@@ -213,7 +213,7 @@ object DotNetTestReport : BuildType({
     }
 
     dependencies {
-        dependency(Test1) {
+        dependency(DotNetTest1) {
             snapshot {
                 onDependencyFailure = FailureAction.IGNORE
             }
@@ -222,7 +222,7 @@ object DotNetTestReport : BuildType({
                 artifactRules = "+:*/*.dcvr"
             }
         }
-        dependency(Test2) {
+        dependency(DotNetTest2) {
             snapshot {
                 onDependencyFailure = FailureAction.IGNORE
             }
