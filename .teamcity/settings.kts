@@ -84,4 +84,14 @@ object SpringWebApp_Test : BuildType({
     vcs {
         root(DslContext.settingsRoot)
     }
+
+    steps {
+        gradle {
+            id = "gradle_runner"
+            tasks = "build"
+            buildFile = "spring-web/build.gradle"
+            gradleWrapperPath = "spring-web"
+            jdkHome = "%env.JDK_17_0%"
+        }
+    }
 })
