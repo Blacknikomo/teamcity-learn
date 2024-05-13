@@ -60,4 +60,8 @@ object SpringWebApp : Project({
 
 object SpringWebApp_Build : BuildType({
     name = "Build"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
 })
