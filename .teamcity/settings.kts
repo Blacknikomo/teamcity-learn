@@ -1,6 +1,10 @@
 import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetBuild
 import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
+import jetbrains.buildServer.configs.kotlin.buildSteps.dotCover
+import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetPack
+import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetTest
 
 /*
 The settings script is an entry point for defining a TeamCity
