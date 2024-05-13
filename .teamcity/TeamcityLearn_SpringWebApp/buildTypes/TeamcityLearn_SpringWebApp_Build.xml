@@ -3,7 +3,11 @@
   <name>Build</name>
   <description />
   <settings>
-    <parameters />
+    <parameters>
+      <param name="param-param"><![CDATA[{ 
+ "name": "den",
+}]]></param>
+    </parameters>
     <build-runners>
       <runner id="gradle_runner" name="Build app" type="gradle-runner">
         <parameters>
