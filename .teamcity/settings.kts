@@ -54,4 +54,10 @@ object Build : BuildType({
 
 object SpringWebApp : Project({
     name = "Spring Web App"
+
+    buildType(SpringWebApp_Build)
+})
+
+object SpringWebApp_Build : BuildType({
+    name = "Build"
 })
