@@ -34,6 +34,12 @@ project {
 
 object NetPipeline : Project({
     name = ".NET Pipeline"
+
+    buildType(NetPipeline_Build)
+})
+
+object NetPipeline_Build : BuildType({
+    name = "Build"
 })
 
 
