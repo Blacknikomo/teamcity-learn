@@ -80,4 +80,8 @@ object SpringWebApp_Build : BuildType({
 
 object SpringWebApp_Test : BuildType({
     name = "Test"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
 })
