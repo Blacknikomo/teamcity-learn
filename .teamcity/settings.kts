@@ -26,8 +26,8 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 version = "2024.03"
 
 project {
-
     subProject(SpringWebApp)
+    subProject(DotNetPipeline)
 }
 
 
@@ -75,6 +75,161 @@ object SpringWebApp_Test : BuildType({
 
     dependencies {
         snapshot(SpringWebApp_Build) {
+        }
+    }
+})
+
+
+
+object DotNetPipeline : Project({
+    name = "DotNet Pipeline"
+
+    buildType(DotNetBuild)
+    buildType(DotNetNuGetPack)
+    buildType(DotNetTestReport)
+    buildType(DotNetTest2)
+    buildType(DotNetTest1)
+})
+
+
+object DotNetBuild : BuildType({
+    name = "Build"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        dotnetBuild {
+            id = "dotnet"
+            projects = "SampleDotNetProj.sln"
+            sdk = "8"
+        }
+    }
+
+    features {
+        perfmon {
+        }
+    }
+})
+
+object DotNetNuGetPack : BuildType({
+    name = "NuGet Pack"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        dotnetPack {
+            name = "Pack"
+            id = "Pack_1"
+            projects = "SampleDotNetProj"
+            configuration = "Debug"
+            outputDir = "SampleDotNetProj/package"
+            versionSuffix = "1.0.0"
+            sdk = "8"
+            param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
+        }
+    }
+
+    dependencies {
+        snapshot(Build) {
+        }
+    }
+})
+
+object DotNetTest1 : BuildType({
+    name = "Test1"
+
+    artifactRules = "%teamcity.agent.home.dir%/temp/agentTmp/*.dcvr=>Snapshot1"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        dotnetTest {
+            id = "dotnet"
+            projects = "TestSuite1/TestSuite1.csproj"
+            sdk = "8"
+            coverage = dotcover {
+                toolPath = "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%"
+            }
+        }
+    }
+
+    features {
+        perfmon {
+        }
+    }
+
+    dependencies {
+        snapshot(NuGetPack) {
+        }
+    }
+})
+
+object DotNetTest2 : BuildType({
+    name = "Test2"
+
+    artifactRules = "%teamcity.agent.home.dir%/temp/agentTmp/*.dcvr=>Snapshot2"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        dotnetTest {
+            id = "dotnet"
+            projects = "TestSuite2/TestSuite2.csproj"
+            sdk = "8"
+            coverage = dotcover {
+                toolPath = "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%"
+            }
+        }
+    }
+
+    dependencies {
+        snapshot(NuGetPack) {
+        }
+    }
+})
+
+object DotNetTestReport : BuildType({
+    name = "TestReport"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
+
+    steps {
+        dotCover {
+            name = "dotCover"
+            id = "dotCover"
+            toolPath = "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%"
+            snapshotPaths = """"%teamcity.build.workingDir%/*/*.dcvr""""
+        }
+    }
+
+    dependencies {
+        dependency(Test1) {
+            snapshot {
+                onDependencyFailure = FailureAction.IGNORE
+            }
+
+            artifacts {
+                artifactRules = "+:*/*.dcvr"
+            }
+        }
+        dependency(Test2) {
+            snapshot {
+                onDependencyFailure = FailureAction.IGNORE
+            }
+
+            artifacts {
+                artifactRules = "+:*/*.dcvr"
+            }
         }
     }
 })
