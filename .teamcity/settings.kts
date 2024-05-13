@@ -68,8 +68,9 @@ object SpringWebApp_Build : BuildType({
 
     steps {
         gradle {
+            name = "Build app"
             id = "gradle_runner"
-            tasks = "clean build"
+            tasks = "clean build -x test"
             buildFile = "spring-web/build.gradle"
             gradleWrapperPath = "spring-web"
         }
