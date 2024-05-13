@@ -29,6 +29,8 @@ version = "2024.03"
 project {
 
     buildType(Build)
+
+    subProject(SpringWebApp)
 }
 
 object Build : BuildType({
@@ -47,4 +49,9 @@ object Build : BuildType({
         perfmon {
         }
     }
+})
+
+
+object SpringWebApp : Project({
+    name = "Spring Web App"
 })
