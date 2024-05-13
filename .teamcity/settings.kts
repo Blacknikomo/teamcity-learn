@@ -56,6 +56,7 @@ object Build : BuildType({
 object SpringWebApp : Project({
     name = "Spring Web App"
 
+    buildType(SpringWebApp_Test)
     buildType(SpringWebApp_Build)
 })
 
@@ -75,4 +76,8 @@ object SpringWebApp_Build : BuildType({
             gradleWrapperPath = "spring-web"
         }
     }
+})
+
+object SpringWebApp_Test : BuildType({
+    name = "Test"
 })
