@@ -94,4 +94,9 @@ object SpringWebApp_Test : BuildType({
             jdkHome = "%env.JDK_17_0%"
         }
     }
+
+    dependencies {
+        snapshot(SpringWebApp_Build) {
+        }
+    }
 })
