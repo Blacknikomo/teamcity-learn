@@ -40,6 +40,10 @@ object NetPipeline : Project({
 
 object NetPipeline_Build : BuildType({
     name = "Build"
+
+    vcs {
+        root(DslContext.settingsRoot)
+    }
 })
 
 
