@@ -217,6 +217,7 @@ object SpringWebApp_Build : BuildType({
             tasks = "clean build -x test"
             buildFile = "spring-web/build.gradle"
             gradleWrapperPath = "spring-web"
+            jdkHome = "%env.JDK_17_0%"
         }
     }
 })
