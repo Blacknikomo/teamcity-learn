@@ -1,8 +1,7 @@
 import jetbrains.buildServer.configs.kotlin.*
-import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetBuild
-import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.buildSteps.dotCover
+import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetBuild
 import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetPack
 import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetTest
 
@@ -32,32 +31,25 @@ version = "2024.03"
 
 project {
 
-    subProject(NetPipeline)
-    subProject(SpringWebApp)
+    buildType(Test1)
+    buildType(Test2)
+    buildType(NuGetPack)
+    buildType(TestReport)
+    buildType(Build)
 }
 
-
-object NetPipeline : Project({
-    name = ".NET Pipeline"
-
-    buildType(NetPipeline_Build)
-    buildType(NetPipeline_NuGetPack)
-    buildType(NetPipeline_TestReport)
-    buildType(NetPipeline_Test2)
-    buildType(NetPipeline_Test1)
-})
-
-object NetPipeline_Build : BuildType({
+object Build : BuildType({
     name = "Build"
 
     vcs {
-        root(DslContext.settingsRoot)
+        root(AbsoluteId("TeamcityLearn_HttpsGithubComBlacknikomoTeamcityLearnRefsHeadsMain"))
     }
 
     steps {
         dotnetBuild {
             id = "dotnet"
             projects = "SampleDotNetProj.sln"
+            workingDir = "dot-net-pipeline"
             sdk = "8"
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
         }
@@ -69,12 +61,11 @@ object NetPipeline_Build : BuildType({
     }
 })
 
-
-object NetPipeline_NuGetPack : BuildType({
+object NuGetPack : BuildType({
     name = "NuGet Pack"
 
     vcs {
-        root(DslContext.settingsRoot)
+        root(AbsoluteId("TeamcityLearn_HttpsGithubComBlacknikomoTeamcityLearnRefsHeadsMain"))
     }
 
     steps {
@@ -82,6 +73,7 @@ object NetPipeline_NuGetPack : BuildType({
             name = "Pack"
             id = "Pack_1"
             projects = "SampleDotNetProj"
+            workingDir = "dot-net-pipeline"
             configuration = "Debug"
             outputDir = "SampleDotNetProj/package"
             versionSuffix = "1.0.0"
@@ -91,24 +83,25 @@ object NetPipeline_NuGetPack : BuildType({
     }
 
     dependencies {
-        snapshot(NetPipeline_Build) {
+        snapshot(Build) {
         }
     }
 })
 
-object NetPipeline_Test1 : BuildType({
+object Test1 : BuildType({
     name = "Test1"
 
     artifactRules = "%teamcity.agent.home.dir%/temp/agentTmp/*.dcvr=>Snapshot1"
 
     vcs {
-        root(DslContext.settingsRoot)
+        root(AbsoluteId("TeamcityLearn_HttpsGithubComBlacknikomoTeamcityLearnRefsHeadsMain"))
     }
 
     steps {
         dotnetTest {
             id = "dotnet"
             projects = "TestSuite1/TestSuite1.csproj"
+            workingDir = "dot-net-pipeline"
             sdk = "8"
             coverage = dotcover {
                 toolPath = "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%"
@@ -122,24 +115,25 @@ object NetPipeline_Test1 : BuildType({
     }
 
     dependencies {
-        snapshot(NetPipeline_NuGetPack) {
+        snapshot(NuGetPack) {
         }
     }
 })
 
-object NetPipeline_Test2 : BuildType({
+object Test2 : BuildType({
     name = "Test2"
 
     artifactRules = "%teamcity.agent.home.dir%/temp/agentTmp/*.dcvr=>Snapshot2"
 
     vcs {
-        root(DslContext.settingsRoot)
+        root(AbsoluteId("TeamcityLearn_HttpsGithubComBlacknikomoTeamcityLearnRefsHeadsMain"))
     }
 
     steps {
         dotnetTest {
             id = "dotnet"
             projects = "TestSuite2/TestSuite2.csproj"
+            workingDir = "dot-net-pipeline"
             sdk = "8"
             coverage = dotcover {
                 toolPath = "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%"
@@ -148,16 +142,16 @@ object NetPipeline_Test2 : BuildType({
     }
 
     dependencies {
-        snapshot(NetPipeline_NuGetPack) {
+        snapshot(NuGetPack) {
         }
     }
 })
 
-object NetPipeline_TestReport : BuildType({
+object TestReport : BuildType({
     name = "TestReport"
 
     vcs {
-        root(DslContext.settingsRoot)
+        root(AbsoluteId("TeamcityLearn_HttpsGithubComBlacknikomoTeamcityLearnRefsHeadsMain"))
     }
 
     steps {
@@ -170,7 +164,7 @@ object NetPipeline_TestReport : BuildType({
     }
 
     dependencies {
-        dependency(NetPipeline_Test1) {
+        dependency(Test1) {
             snapshot {
                 onDependencyFailure = FailureAction.IGNORE
             }
@@ -179,7 +173,7 @@ object NetPipeline_TestReport : BuildType({
                 artifactRules = "+:*/*.dcvr"
             }
         }
-        dependency(NetPipeline_Test2) {
+        dependency(Test2) {
             snapshot {
                 onDependencyFailure = FailureAction.IGNORE
             }
@@ -187,60 +181,6 @@ object NetPipeline_TestReport : BuildType({
             artifacts {
                 artifactRules = "+:*/*.dcvr"
             }
-        }
-    }
-})
-
-
-
-
-
-
-object SpringWebApp : Project({
-    name = "Spring Web App"
-
-    buildType(SpringWebApp_Test)
-    buildType(SpringWebApp_Build)
-})
-
-object SpringWebApp_Build : BuildType({
-    name = "Build"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        gradle {
-            name = "Build app"
-            id = "gradle_runner"
-            tasks = "clean build -x test"
-            buildFile = "spring-web/build.gradle"
-            gradleWrapperPath = "spring-web"
-            jdkHome = "%env.JDK_17_0%"
-        }
-    }
-})
-
-object SpringWebApp_Test : BuildType({
-    name = "Test"
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        gradle {
-            id = "gradle_runner"
-            tasks = "build"
-            buildFile = "spring-web/build.gradle"
-            gradleWrapperPath = "spring-web"
-            jdkHome = "%env.JDK_17_0%"
-        }
-    }
-
-    dependencies {
-        snapshot(SpringWebApp_Build) {
         }
     }
 })
