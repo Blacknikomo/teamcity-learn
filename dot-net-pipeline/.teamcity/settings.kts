@@ -1,5 +1,4 @@
 import jetbrains.buildServer.configs.kotlin.*
-import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.buildSteps.dotCover
 import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetBuild
 import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetPack
@@ -54,11 +53,6 @@ object Build : BuildType({
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
         }
     }
-
-    features {
-        perfmon {
-        }
-    }
 })
 
 object NuGetPack : BuildType({
@@ -106,11 +100,6 @@ object Test1 : BuildType({
             coverage = dotcover {
                 toolPath = "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%"
             }
-        }
-    }
-
-    features {
-        perfmon {
         }
     }
 
